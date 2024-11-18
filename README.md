@@ -13,3 +13,4 @@
 - libnotify
 - nwg-look
 - ttf-font-awesome
+- pavucontrol
