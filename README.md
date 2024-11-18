@@ -11,4 +11,4 @@
 - Rofi
 - Swaync
 - libnotify
-- 
+- nwg-look
