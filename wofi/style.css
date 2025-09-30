@@ -1,0 +1,64 @@
+window {
+    margin: 0px;
+    border: 2px solid rgba(120, 60, 200, 0.6); /* purple glow border */
+    background-color: rgba(10, 10, 25, 0.88);  /* cosmic dark background */
+    border-radius: 14px;
+    font-family: "FiraCode Nerd Font", monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: #c084fc; /* default purple text */
+}
+
+#input {
+    margin: 10px;
+    padding: 6px 10px;
+    border: 1px solid rgba(164, 244, 249, 1.0); /* cyan accent border */
+    border-radius: 10px;
+    background-color: rgba(20, 20, 35, 0.9);
+    color: #a4f4f9; /* cyan text */
+}
+
+#input:focus {
+    border: 1px solid #ff6ec7; /* pink glow when typing */
+    color: #ffffff;
+}
+
+#inner-box {
+    margin: 8px;
+    padding: 8px;
+    background-color: transparent;
+}
+
+#outer-box {
+    margin: 0px;
+    padding: 0px;
+    background-color: transparent;
+}
+
+#scroll {
+    margin: 0px;
+    padding: 0px;
+    background: transparent;
+}
+
+#text {
+    margin: 2px;
+    padding: 4px 8px;
+    color: #c084fc; /* default purple text */
+}
+
+#entry {
+    border-radius: 8px;
+    padding: 4px;
+    transition: all 0.2s ease;
+}
+
+#entry:selected {
+    background-color: rgba(255, 110, 199, 0.3); /* neon pink selection */
+    color: #ffffff; /* bright text */
+    border: 1px solid #ff6ec7;
+}
+
+#entry:selected #text {
+    color: #ffffff;
+}

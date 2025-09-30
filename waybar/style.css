@@ -1,0 +1,99 @@
+* {
+    border: none;
+    font-family: "FiraCode Nerd Font", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    min-height: 0;
+}
+
+/* ==== Waybar Window ==== */
+window#waybar {
+    background: rgba(0, 0, 0, 0.75); /* cosmic dark transparency */
+    
+    color: #c084fc; /* default purple text */
+}
+
+
+
+/* ==== Workspaces ==== */
+#workspaces button {
+    background: transparent;
+    color: #c084fc; /* purple idle */
+    padding-top: 8px;
+    padding-bottom: 2px;
+    margin: 3px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#workspaces button:hover {
+    background: rgba(120, 60, 200, 0.4); /* purple haze */
+    color: #ffffff; /* bright hover */
+}
+
+#workspaces button.focused {
+    background: rgba(164, 244, 249, 0.25); /* cyan active */
+    color: #a4f4f9;
+    border: 1px solid #a4f4f9;
+}
+
+#workspaces button.urgent {
+    background: rgba(255, 110, 199, 0.4); /* neon pink urgent */
+    color: #ff6ec7;
+}
+
+/* ==== Pulseaudio ==== */
+#pulseaudio {
+    color: #ffd479; /* yellow volume */
+    padding: 0 8px;
+}
+
+#pulseaudio.muted {
+    color: #666666; /* grey muted */
+}
+
+/* ==== Clock ==== */
+#clock {
+    color: #a4f4f9; /* neon cyan glow */
+    padding-top: 8px;
+    padding-bottom: 2px;
+}
+
+/* ==== Tray ==== */
+#tray {
+    padding: 0 6px;
+}
+
+#tray > .passive {
+    opacity: 0.6;
+}
+
+#tray > .active {
+    opacity: 1;
+}
+
+#tray > .needs-attention {
+    background: rgba(255, 110, 199, 0.3); /* neon pink alert */
+    border-radius: 6px;
+}
+
+/* ==== Idle Inhibitor ==== */
+#idle_inhibitor {
+    color: #c084fc; /* purple by default */
+    padding: 0 8px;
+    transition: all 0.2s ease;
+}
+
+#idle_inhibitor.activated {
+    color: #ff6ec7; /* neon pink when active */
+}
+
+/* ==== Power Profiles ==== */
+#power-profiles-daemon {
+    color: #ffd479; /* star yellow by default */
+    padding: 0 8px;
+}
+
+#power-profiles-daemon.performance {
+    color: #ff6ec7;
+}
