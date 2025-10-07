@@ -1,64 +1,78 @@
+/* === Cosmic Wofi Theme === */
+/* Matches your Waybar cosmic-pastel aesthetic */
+
 window {
-    margin: 0px;
-    border: 2px solid rgba(120, 60, 200, 0.6); /* purple glow border */
-    background-color: rgba(10, 10, 25, 0.88);  /* cosmic dark background */
-    border-radius: 14px;
-    font-family: "FiraCode Nerd Font", monospace;
-    font-size: 14px;
-    font-weight: bold;
-    color: #c084fc; /* default purple text */
+  background-color: rgba(34, 36, 54, 0.7);
+  border: 2px solid rgba(120, 60, 200, 0.6);
+  border-radius: 12px;
+  padding: 10px;
 }
 
 #input {
-    margin: 10px;
-    padding: 6px 10px;
-    border: 1px solid rgba(164, 244, 249, 1.0); /* cyan accent border */
-    border-radius: 10px;
-    background-color: rgba(20, 20, 35, 0.9);
-    color: #a4f4f9; /* cyan text */
+  margin: 10px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background-color: rgba(22, 19, 32, 0.9);
+  color: #B5E8E0;
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  font-weight: bold;
+  border: 1px solid rgba(120, 60, 200, 0.4);
 }
 
 #input:focus {
-    border: 1px solid #ff6ec7; /* pink glow when typing */
-    color: #ffffff;
-}
-
-#inner-box {
-    margin: 8px;
-    padding: 8px;
-    background-color: transparent;
-}
-
-#outer-box {
-    margin: 0px;
-    padding: 0px;
-    background-color: transparent;
+  outline: none;
+  border: 1px solid #89B4FA;
+  box-shadow: 0 0 6px #89B4FA;
 }
 
 #scroll {
-    margin: 0px;
-    padding: 0px;
-    background: transparent;
-}
-
-#text {
-    margin: 2px;
-    padding: 4px 8px;
-    color: #c084fc; /* default purple text */
+  margin: 6px;
+  padding: 4px;
 }
 
 #entry {
-    border-radius: 8px;
-    padding: 4px;
-    transition: all 0.2s ease;
+  background-color: transparent;
+  color: #DDB6F2;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
 }
 
 #entry:selected {
-    background-color: rgba(255, 110, 199, 0.3); /* neon pink selection */
-    color: #ffffff; /* bright text */
-    border: 1px solid #ff6ec7;
+  background-color: #89B4FA;
+  color: #161320;
+  border-radius: 6px;
+  box-shadow: 0 0 8px #89B4FA;
+  transform: scale(1.02);
 }
 
-#entry:selected #text {
-    color: #ffffff;
+#entry:hover {
+  background-color: rgba(164, 244, 249, 0.15);
+  color: #A6E3A1;
+}
+
+#text {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 13px;
+}
+
+#img {
+  margin-right: 8px;
+}
+
+/* Scrollbar styling */
+scrollbar, scrollbar * {
+  border: none;
+  background: transparent;
+}
+
+scrollbar slider {
+  background-color: rgba(136, 192, 208, 0.5);
+  border-radius: 6px;
+}
+
+/* Subtle shadow for depth */
+window {
+  box-shadow: 0 0 25px rgba(120, 60, 200, 0.4);
 }
