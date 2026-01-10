@@ -9,12 +9,14 @@
   
   "modules-left": [
     "hyprland/workspaces",
-    "tray"
+    "wlr/taskbar"
+    
   ],
   "modules-center": [
     "clock"
   ],
   "modules-right": [
+    "tray",
     "idle_inhibitor",
     "power-profiles-daemon",
     "cpu",
@@ -24,12 +26,7 @@
     
     
   ],
-  
-  "custom/archicon": {
-    "format": "",
-    "on-click": "wofi --show drun",
-    "tooltip": false
-  },
+
   "clock": {
     "timezone": "America/New_York",
     "format": "{:%A %B %d %Y %H:%M}",

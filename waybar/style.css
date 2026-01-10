@@ -1,183 +1,219 @@
-/* -- Global rules -- */
+/* =========================
+   Global
+   ========================= */
+
 * {
   border: none;
-  font-family: "JetbrainsMono Nerd Font";
+  border-radius: 0;
+  font-family: "Inter", "JetBrains Mono", sans-serif;
   font-size: 13px;
-  font-weight: bold;
-  min-height: 10px;
+  min-height: 0;
 }
 
 window#waybar {
-  background: rgba(34, 36, 54, 0.6);
+  background: rgba(8, 10, 20, 0.65);
+  color: #dce3ff;
+  border-radius: 14px;
+  padding: 6px 10px;
 }
 
-window#waybar.hidden {
-  opacity: 0.2;
-}
+/* =========================
+   Module base style
+   ========================= */
 
-/* - General rules for visible modules -- */
-#power-profiles-daemon,
-#custom-archicon,
+#workspaces,
+#tray,
 #clock,
+#idle_inhibitor,
+#power-profiles-daemon,
 #cpu,
 #memory,
-#disk,
 #temperature,
-#idle_inhibitor,
-#pulseaudio,
-#pulseaudio_slider,
-#network,
-#language {
-  color: #161320;
-  margin-top: 6px;
-  margin-bottom: 6px;
-  padding-left: 10px;
-  padding-right: 10px;
-  transition: none;
+#pulseaudio {
+  background: rgba(20, 24, 45, 0.75);
+  margin: 4px 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
 }
 
-/* Separation to the left */
-#custom-archicon,
-#cpu,
-#idle_inhibitor {
-  margin-left: 5px;
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
+/* Hover glow */
+#tray:hover,
+#clock:hover,
+#idle_inhibitor:hover,
+#power-profiles-daemon:hover,
+#cpu:hover,
+#memory:hover,
+#temperature:hover,
+#pulseaudio:hover {
+  background: rgba(35, 40, 70, 0.85);
 }
 
-/* Separation to the rigth */
-#clock,
-#temperature,
-#language {
-  margin-right: 5px;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+
+
+#taskbar {
+  background: rgba(20, 24, 45, 0.75);
+  padding: 4px 6px;
+  margin: 4px 6px;
+  border-radius: 999px;
 }
 
-/* -- Specific styles -- */
-
-/* Modules left */
-#custom-archicon {
-  font-size: 20px;
-  color: #89B4FA;
-  background: #161320;
-  padding-right: 17px;
+/* Task buttons */
+#taskbar button {
+  background: transparent;
+  padding: 6px 10px;
+  margin: 0 4px;
+  border-radius: 999px;
+  color: #8fa3ff;
+  transition: all 0.2s ease;
 }
 
-#clock {
-  background: #ABE9B3;
-  border-radius: 10px;
+/* Hover */
+#taskbar button:hover {
+  background: rgba(35, 40, 70, 0.85);
 }
 
-#cpu {
-  background: #96CDFB;
+/* Active / focused window */
+#taskbar button.active {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 201, 240, 0.8),
+    rgba(157, 78, 221, 0.8)
+  );
+  color: #0b0f1f;
 }
 
-#memory {
-  background: #DDB6F2;
+/* Urgent windows */
+#taskbar button.urgent {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 122, 24, 0.9),
+    rgba(255, 61, 129, 0.9)
+  );
+  color: #0b0f1f;
 }
 
-#disk {
-  background: #F5C2E7;
-}
 
-#temperature {
-  background: #F8BD96;
-}
 
-/* Modules center */
+/* =========================
+   Workspaces (Hyprland)
+   ========================= */
+
 #workspaces {
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-  margin: 6px 5px;
-  padding: 0px 6px;
+  padding: 4px 8px;
 }
 
 #workspaces button {
-  color: #B5E8E0;
+  padding: 4px 10px;
+  margin: 0 3px;
+  border-radius: 999px;
+  color: #8fa3ff;
   background: transparent;
-  padding: 4px 4px;
-  transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
-}
-
-#workspaces button.occupied {
-  color: #A6E3A1;
 }
 
 #workspaces button.active {
-  color: #89B4FA;
-  text-shadow: 0 0 4px #ABE9B3;
+  background: linear-gradient(
+    135deg,
+    #4cc9f0,
+    #9d4edd
+  );
+  color: #0b0f1f;
 }
 
-#workspaces button:hover {
-  color: #89B4FA;
+#workspaces button.urgent {
+  background: linear-gradient(
+    135deg,
+    #ff7a18,
+    #ff3d81
+  );
+  color: #0b0f1f;
 }
 
-#workspaces button.active:hover {}
+/* =========================
+   Clock (cosmic highlight)
+   ========================= */
 
-/* Modules right */
-#taskbar {
-  background: transparent;
-  border-radius: 10px;
-  padding: 0px 5px;
-  margin: 6px 5px;
+#clock {
+  background: linear-gradient(
+    135deg,
+    rgba(76, 201, 240, 0.25),
+    rgba(157, 78, 221, 0.25)
+  );
+  color: #e8ecff;
+  font-weight: 600;
 }
 
-#taskbar button {
-  padding: 0px 5px;
-  margin: 0px 3px;
-  border-radius: 6px;
-  transition: background 0.3s ease;
+/* =========================
+   System status modules
+   ========================= */
+
+#cpu {
+  color: #4cc9f0;
 }
 
-#taskbar button.active {
-  background: rgba(34, 36, 54, 0.5);
+#memory {
+  color: #9d4edd;
 }
 
-#taskbar button:hover {
-  background: rgba(34, 36, 54, 0.5);
+#temperature {
+  color: #fcbf49;
 }
 
+#temperature.critical {
+  background: rgba(255, 61, 129, 0.25);
+  color: #ff3d81;
+}
+
+/* =========================
+   Audio
+   ========================= */
+
+#pulseaudio {
+  color: #72efdd;
+}
+
+#pulseaudio.muted {
+  color: #6c757d;
+}
+
+/* =========================
+   Power / Idle
+   ========================= */
 
 #idle_inhibitor {
-  background: #B5E8E0;
-  margin: 5px;
-  border-radius: 5px;
-  padding-right: 15px;
+  color: #b5e48c;
+}
+
+#idle_inhibitor.activated {
+  background: rgba(181, 228, 140, 0.25);
+  color: #e9ffcf;
 }
 
 #power-profiles-daemon {
-  background: #DDB6F2;
-  margin: 5px;
-  border-radius: 5px;
+  color: #f77f00;
 }
 
-
-#pulseaudio {
-  color: #1A1826;
-  background: #ffd479;
-  border-radius: 10px;
+#power-profiles-daemon.performance {
+  background: rgba(247, 127, 0, 0.25);
 }
 
-#pulseaudio_slider {
-  color: #1A1826;
-  background: #E8A2AF;
+#power-profiles-daemon.power-saver {
+  background: rgba(76, 201, 240, 0.25);
 }
 
-#network {
-  background: #CBA6F7;
-  padding-right: 13px;
+/* =========================
+   Tray
+   ========================= */
+
+#tray {
+  padding: 6px 10px;
 }
 
-#language {
-  background: #A6E3A1;
-  padding-right: 15px;
+#tray > .passive {
+  opacity: 0.6;
 }
 
-/* === Optional animation === */
-@keyframes blink {
-  to {
-    background-color: #BF616A;
-    color: #B5E8E0;
-  }
+#tray > .needs-attention {
+  background: rgba(255, 61, 129, 0.35);
+  border-radius: 50%;
 }
