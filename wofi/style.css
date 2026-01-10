@@ -1,78 +1,82 @@
-/* === Cosmic Wofi Theme === */
-/* Matches your Waybar cosmic-pastel aesthetic */
+/* =========================
+   Global
+   ========================= */
 
-window {
-  background-color: rgba(34, 36, 54, 0.7);
-  border: 2px solid rgba(120, 60, 200, 0.6);
+* {
+  font-family: "Inter", "JetBrains Mono", sans-serif;
+  font-size: 14px;
   border-radius: 12px;
-  padding: 10px;
 }
 
+/* =========================
+   Window
+   ========================= */
+
+window {
+  background-color: rgba(8, 10, 20, 0.92);
+  border: 2px solid rgba(157, 78, 221, 0.85);
+  padding: 12px;
+}
+
+/* =========================
+   Input bar
+   ========================= */
+
 #input {
-  margin: 10px;
-  border-radius: 8px;
-  padding: 8px 10px;
-  background-color: rgba(22, 19, 32, 0.9);
-  color: #B5E8E0;
-  font-family: "JetBrainsMono Nerd Font";
-  font-size: 13px;
-  font-weight: bold;
-  border: 1px solid rgba(120, 60, 200, 0.4);
+  background-color: rgba(20, 24, 45, 0.9);
+  color: #e8ecff;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border: 2px solid rgba(76, 201, 240, 0.8);
 }
 
 #input:focus {
-  outline: none;
-  border: 1px solid #89B4FA;
-  box-shadow: 0 0 6px #89B4FA;
+  border-color: rgba(114, 239, 221, 0.9);
+}
+
+/* =========================
+   Inner box
+   ========================= */
+
+#inner-box {
+  background-color: transparent;
+}
+
+/* =========================
+   Entry list
+   ========================= */
+
+#outer-box {
+  background-color: transparent;
 }
 
 #scroll {
-  margin: 6px;
-  padding: 4px;
+  margin-top: 6px;
 }
 
+/* =========================
+   Entries
+   ========================= */
+
 #entry {
-  background-color: transparent;
-  color: #DDB6F2;
-  padding: 6px 10px;
-  border-radius: 6px;
-  transition: all 0.2s ease-in-out;
+  padding: 10px 14px;
+  margin: 6px 0;
+  background-color: rgba(20, 24, 45, 0.75);
+  color: #dce3ff;
 }
 
 #entry:selected {
-  background-color: #89B4FA;
-  color: #161320;
-  border-radius: 6px;
-  box-shadow: 0 0 8px #89B4FA;
-  transform: scale(1.02);
+  background: linear-gradient(
+    135deg,
+    rgba(76, 201, 240, 0.75),
+    rgba(157, 78, 221, 0.75)
+  );
+  color: #0b0f1f;
 }
 
 #entry:hover {
-  background-color: rgba(164, 244, 249, 0.15);
-  color: #A6E3A1;
+  background-color: rgba(35, 40, 70, 0.85);
 }
 
-#text {
-  font-family: "JetBrainsMono Nerd Font";
-  font-size: 13px;
-}
-
-#img {
-  margin-right: 8px;
-}
-
-/* Scrollbar styling */
-scrollbar, scrollbar * {
-  border: none;
-  background: transparent;
-}
-
-scrollbar slider {
-  background-color: rgba(136, 192, 208, 0.5);
-  border-radius: 6px;
-}
-
-/* Subtle shadow for depth */
-window {
-  box-shadow: 0 0 25px rgba(120, 60, 200, 0.4);
-}
+/* =========================
+   Text
