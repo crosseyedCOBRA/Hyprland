@@ -1,0 +1,4 @@
+@define-color pill_border_accent #82d3e2;
+#workspaces, #tray, #clock, #cpu, #memory, #temperature, #network, #pulseaudio, #custom-screenshot, #custom-clipboard {
+  border: 2px solid alpha(@pill_border_accent, 0.6);
+}

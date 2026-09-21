@@ -1,0 +1,39 @@
+# Applies to every wofi invocation (drun launcher, wofi-power,
+# wallpaper-picker -- none of them pass --conf to point elsewhere).
+insensitive=true
+
+# Default is 50%/40% of screen size -- on a 1920x1080 monitor that's
+# 960x432, way oversized for a short app/power-menu list and the actual
+# source of the "dead space" complaint. Narrower fixed pixel dimensions
+# instead. wallpaper-picker overrides these via its own -W/-H CLI flags
+# (CLI takes precedence over this config file), so this doesn't touch its
+# grid.
+width=380
+height=400
+
+# Papirus (gtk.iconTheme, ../../home.nix) app icons in the drun launcher,
+# and wofi-power's own per-entry icons (../../home.nix's powerIcons).
+allow_images=true
+image_size=28
+
+# Apps with more than one .desktop Action= (quicklist entries -- e.g.
+# Zen Browser's "New Private Window", Steam's Store/Library/Friends/etc)
+# get wrapped in a GtkExpander by wofi's own drun mode (confirmed via
+# source: src/wofi.c, `if(node->action_count > 1 && !no_actions)
+# parent = gtk_expander_new("")`) -- GtkExpander draws its own disclosure
+# arrow and pushes the row's icon+label right to make room for it, which
+# is exactly what put some app icons out of alignment with the rest.
+# Disabling multi-actions entirely (same as --no-actions/-a) trades away
+# those quicklist shortcuts for every row rendering as a plain,
+# consistently-aligned entry.
+no_actions=true
+
+# Deliberately NOT setting halign or content_halign at all -- both
+# default to fill, which packs every row's icon+text flush to the same
+# left edge consistently (no per-row misalignment) and, critically,
+# leaves the scrolled area's own sizing alone. Explicitly centering
+# either one (tried both, in turn) either misaligned rows against each
+# other or broke wallpaper-picker's multi-column image grid (it doesn't
+# override halign itself, only columns/image_size/-W/-H, so it inherits
+# whatever this file sets) -- narrower + left-aligned, not centered, is
+# the simpler fix that avoids both problems at once.

@@ -1,0 +1,113 @@
+// Included by every bar object in ./config.jsonc (waybar's own `include`
+// directive -- a bar object's own keys take precedence over included
+// ones, so this only supplies what isn't redefined per-monitor: the
+// common bar-behavior settings and every module's individual config).
+// Only modules-left/center/right and output differ per monitor.
+{
+  "layer": "top",
+  "position": "top",
+  "autohide": true,
+  "autohide-blocked": false,
+  "exclusive": true,
+  "passthrough": false,
+  "gtk-layer-shell": true,
+
+  "clock": {
+    "timezone": "America/New_York",
+    "format": "{:%A %B %d %Y %H:%M}",
+    "tooltip-format": "{calendar}",
+    "calendar": {
+      "mode": "month"
+    }
+  },
+  "cpu": {
+    "format": " {usage}%",
+    "tooltip": true,
+    "tooltip-format": "CPU : {usage}%\nNúcleos: {cores}"
+  },
+  "memory": {
+    "format": " {}%",
+    "tooltip": true,
+    "tooltip-format": "RAM: {used} / {total} ({percentage}%)"
+  },
+  "disk": {
+    "format": "{percentage_free}% ",
+    "tooltip": true,
+    "tooltip-format": "Disk Free: {free} / {total} ({percentage_free}%)"
+  },
+  "temperature": {
+    "format": "{icon} {temperatureC}°C",
+    "tooltip": true,
+    "tooltip-format": "Temperature: {temperatureC}°C",
+    "format-icons": [
+      ""
+    ]
+  },
+
+  // all-outputs left at its default (false, absent here) so each bar
+  // only shows the workspaces actually pinned to ITS OWN output (see
+  // hyprland.lua's hl.workspace_rule monitor pins) -- true would merge
+  // every monitor's workspaces onto every bar regardless of the
+  // per-monitor split below. No waybar-level persistent-workspaces
+  // either -- that generates its own phantom IDs per monitor instead of
+  // using the real ones, so persistence comes from the workspace rules
+  // themselves (persistent = true on each, in hyprland.lua) instead.
+  "hyprland/workspaces": {
+    "format": "{id}",
+    "disable-scroll": true,
+    "show-special": true
+  },
+  "custom/screenshot": {
+    "format": "󰹑",
+    "tooltip-format": "Screenshot (region select)",
+    "on-click": "screenshot-region"
+  },
+  "custom/clipboard": {
+    "format": "",
+    "tooltip-format": "Clipboard history",
+    "on-click": "clipboard-picker"
+  },
+  "pulseaudio": {
+        // "scroll-step": 1, // %, can be a float
+        "format": "{icon} {volume}% {format_source}",
+        "format-bluetooth": "{icon} {volume}% {format_source}",
+        "format-bluetooth-muted": " {icon} {format_source}",
+        "format-muted": " {format_source}",
+        "format-source": " {volume}%",
+        "format-source-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol"
+    },
+  "network": {
+    "format": "󰈁 Connected",
+    "format-wifi": "󰈁 Connected",
+    "format-ethernet": "󰈁 Connected",
+    "format-disconnected": "󰈂 Disconnected",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "tooltip-format-wifi": "{ifname} ({signalStrength}%)",
+    "tooltip-format-ethernet": "{ifname} {ipaddr}/{cidr}",
+    "tooltip-format-disconnected": "Disconnected"
+  },
+  "hyprland/language": {
+    "format": "{} ",
+    "on-click": "hyprctl switchxkblayout at-translated-set-2-keyboard next",
+    "format-es": "ESP",
+    "format-en": "ENG"
+  },
+  "tray": {
+        // "icon-size": 21,
+        "spacing": 5
+        // "icons": {
+        //   "blueman": "bluetooth",
+        //   "TelegramDesktop": "$HOME/.local/share/icons/hicolor/16x16/apps/telegram.png"
+        // }
+    }
+}

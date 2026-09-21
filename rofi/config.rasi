@@ -1,0 +1,8 @@
+configuration {
+font: "JetBrainsMono Nerd Font 11";
+location: 0;
+terminal: "/nix/store/3d9z8d2x0dqamg4ab3335mk0hrh67aqy-alacritty-0.17.0/bin/alacritty";
+xoffset: 0;
+yoffset: 0;
+}
+@theme "custom"

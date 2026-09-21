@@ -72,13 +72,30 @@ local menu        = "wofi --show drun"
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 
 -- Autostart necessary processes (like notifications daemons, status bars, etc.)
--- Or execute your favorite apps at launch like this:
+-- waybar/hyprpaper replace noctalia here to match ./waybar/ and
+-- ./hyprpaper.conf. xdg-desktop-portal-hyprland/-gtk are started by
+-- NixOS's xdg.portal service activation, not needed here. polkit-agent
+-- matches the Awesome session's own autostart (see ../awesome/rc.lua).
 --
- hl.on("hyprland.start", function () 
-   hl.exec_cmd("qs -c noctalia-shell")
---   hl.exec_cmd("nm-applet")
---   hl.exec_cmd("waybar & hyprpaper & firefox")
- end)
+-- random-wallpaper (../home.nix) picks a random image from
+-- ~/Pictures/wallpapers/ every session start, writes hyprpaper's runtime
+-- config for it, and runs matugen + apply-colors against that same pick
+-- -- chained with `&&` into hyprpaper's own launch (pointed at that exact
+-- runtime config, not the static ./hyprpaper.conf) so hyprpaper always
+-- shows the same wallpaper colors were just derived from, no flash of a
+-- different default in between. apply-colors is also what wallpaper-picker
+-- calls after every later manual change, so session-start and live-picked
+-- wallpapers apply colors identically (waybar launch, kitty reload,
+-- Hyprland active-border color, hyprlock background).
+hl.on("hyprland.start", function ()
+  hl.exec_cmd("random-wallpaper && hyprpaper -c ~/.cache/hypr/hyprpaper-runtime.conf")
+  hl.exec_cmd("swaync")
+  hl.exec_cmd("polkit-agent")
+  hl.exec_cmd("swayosd-server") -- volume/brightness OSD backend for the swayosd-client calls below
+  hl.exec_cmd("wl-paste --watch cliphist store") -- feeds clipboard-picker's history (../home.nix)
+  hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+  hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+end)
 
 
 -------------------------------
@@ -210,6 +227,49 @@ hl.animation({ leaf = "zoomFactor",    enabled = true,  speed = 7,    bezier = "
 --     rounding    = 0,
 -- })
 
+-- Pin workspaces to specific monitors. Hyprland's own connector names
+-- (set above in MONITORS, 1-indexed: DP-1/DP-2/DP-3) differ from the
+-- X11 session's xrandr names in configuration.nix (DisplayPort-0/1/2,
+-- 0-indexed) -- DP-1 here is the 165Hz primary (== X11's DisplayPort-0),
+-- DP-2 is the 144Hz monitor rotated right of it (== DisplayPort-1), DP-3
+-- is the 144Hz monitor right of that (== DisplayPort-2). `default = true`
+-- is which workspace that monitor shows on session start/monitor
+-- reconnect -- exactly one per monitor. `persistent = true` is what lets
+-- waybar's hyprland/workspaces module show all 5 of these (even empty,
+-- unfocused ones) using these exact real IDs/monitor pins -- see
+-- ./waybar/config.jsonc's comment on all-outputs/persistent-workspaces.
+hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true })
+hl.workspace_rule({ workspace = "2", monitor = "DP-2", default = true, persistent = true })
+hl.workspace_rule({ workspace = "3", monitor = "DP-3", default = true, persistent = true })
+hl.workspace_rule({ workspace = "4", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "5", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "6", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "7", monitor = "DP-1", persistent = true })
+
+-- Pin specific apps to specific workspaces on open. `class` matches the
+-- window's WM_CLASS -- confirmed live via `hyprctl clients` on the actual
+-- running windows for vesktop and the YouTube Music webapp (vesktop's own
+-- .desktop file claims StartupWMClass=Vesktop, capitalized, but the real
+-- runtime class is lowercase "vesktop" -- caught this exact mismatch by
+-- checking live instead of trusting the .desktop file). Steam's "steam"
+-- is the well-known standard class, not yet confirmed live on this
+-- machine -- double check with `hyprctl clients` once it's actually open.
+-- "silent" (confirmed via Window.cpp: the effect value just needs to
+-- contain that literal word) assigns the window to its workspace without
+-- also jumping your view there -- it opens in the background instead of
+-- yanking focus away from whatever you're currently doing.
+hl.window_rule({ match = { class = "steam" }, workspace = "1 silent" })
+hl.window_rule({ match = { class = "vesktop" }, workspace = "2 silent" })
+hl.window_rule({ match = { class = "chrome-music.youtube.com__-Default" }, workspace = "7 silent" })
+
+-- WebAppHub-generated webapps (YouTube Music, and any future ones) open
+-- floating by default -- confirmed live via `hyprctl clients` on the
+-- actual running YouTube Music window (floating: true straight out of
+-- WebAppHub's Chromium --app= launch). Every WebAppHub webapp's WM_CLASS
+-- is "chrome-<site>__-<profile>", so one regex rule covers all of them,
+-- present and future, rather than needing a rule per webapp.
+hl.window_rule({ match = { class = "^chrome-" }, tile = true })
+
 -- See https://wiki.hypr.land/Configuring/Layouts/Dwindle-Layout/ for more
 hl.config({
     dwindle = {
@@ -237,8 +297,9 @@ hl.config({
 
 hl.config({
     misc = {
-        force_default_wallpaper = 0,    -- Set to 0 or 1 to disable the anime mascot wallpapers
-        disable_hyprland_logo   = true, -- If true disables the random hyprland logo / anime girl background. :(
+        force_default_wallpaper  = 0,    -- Set to 0 or 1 to disable the anime mascot wallpapers
+        disable_hyprland_logo    = true, -- If true disables the random hyprland logo / anime girl background. :(
+        disable_splash_rendering = true, -- If true disables the random splash text (e.g. "better call vaxry") at the bottom of the screen
     },
 })
 
@@ -289,7 +350,15 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
+-- hyprshutdown isn't installed/requested; wofi-power (home.nix) is the
+-- same power menu the traditional hyprland.conf used, wofi-based like
+-- the rest of this session.
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wofi-power"))
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock-timeout"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("wallpaper-picker"))
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client -t"))
+hl.bind("Print", hl.dsp.exec_cmd("screenshot-region"))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("clipboard-picker"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
@@ -302,12 +371,12 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
--- Switch workspaces with mainMod + [0-9]
--- Move active window to a workspace with mainMod + SHIFT + [0-9]
-for i = 1, 10 do
-    local key = i % 10 -- 10 maps to key 0
-    hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
-    hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
+-- Switch workspaces with mainMod + [1-7] (7 total, see the
+-- hl.workspace_rule monitor pins above)
+-- Move active window to a workspace with mainMod + SHIFT + [1-7]
+for i = 1, 7 do
+    hl.bind(mainMod .. " + " .. i,             hl.dsp.focus({ workspace = i}))
+    hl.bind(mainMod .. " + SHIFT + " .. i,     hl.dsp.window.move({ workspace = i }))
 end
 
 -- Example special workspace (scratchpad)
@@ -322,13 +391,18 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Laptop multimedia keys for volume and LCD brightness
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),      { locked = true, repeating = true })
-hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),     { locked = true, repeating = true })
-hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),   { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"),                  { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"),                  { locked = true, repeating = true })
+-- Laptop multimedia keys for volume and LCD brightness -- swayosd-client
+-- both performs the change AND shows the OSD popup in one call (the
+-- swayosd-server autostart above is what actually renders it), replacing
+-- the old bare wpctl/brightnessctl calls, which had no visual feedback
+-- at all. --max-volume caps output raise at 100%, matching wpctl's old
+-- `-l 1` limit.
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("swayosd-client --output-volume +5 --max-volume 100"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("swayosd-client --output-volume -5"),                  { locked = true, repeating = true })
+hl.bind("XF86AudioMute",        hl.dsp.exec_cmd("swayosd-client --output-volume mute-toggle"),         { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute",     hl.dsp.exec_cmd("swayosd-client --input-volume mute-toggle"),          { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessUp",  hl.dsp.exec_cmd("swayosd-client --brightness +5"),                     { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown",hl.dsp.exec_cmd("swayosd-client --brightness -5"),                     { locked = true, repeating = true })
 
 -- Requires playerctl
 hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = true })
