@@ -24,7 +24,7 @@ ShellRoot {
     // to this file (keyed by output name) whenever it changes.
     FileView {
         id: awesomeTagsFile
-        path: "/home/mike/.cache/awesome/tags.json"
+        path: Quickshell.env("HOME") + "/.cache/awesome/tags.json"
         watchChanges: true
         onFileChanged: this.reload()
     }
@@ -76,7 +76,7 @@ ShellRoot {
                     Image {
                         anchors.fill: parent
                         anchors.margins: 3
-                        source: "/home/mike/.config/quickshell/nix-snowflake-white.svg"
+                        source: Qt.resolvedUrl("nix-snowflake-white.svg")
                         sourceSize: Qt.size(16, 16)
                         fillMode: Image.PreserveAspectFit
                     }
@@ -124,7 +124,7 @@ ShellRoot {
                                 anchors.fill: parent
                                 onClicked: {
                                     awesomeViewTag.command = [
-                                        "/home/mike/.config/quickshell/awesome-view-tag.sh",
+                                        Qt.resolvedUrl("awesome-view-tag.sh").toString().replace("file://", ""),
                                         bar.screen.name,
                                         modelData.name
                                     ];

@@ -3,7 +3,7 @@
  * autostart) -- this file only defines structure/layout, which stays
  * static regardless of wallpaper. Same semantic roles as
  * ../waybar/style.css and ../wofi/style.css. */
-@import url("/home/mike/.config/hypr/colors.css");
+@import url("../hypr/colors.css");
 
 * {
   font-family: "Inter", "JetBrains Mono", sans-serif;
