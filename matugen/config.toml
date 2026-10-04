@@ -4,6 +4,17 @@
 
 [config]
 
+# Fixed terminal hues, each nudged toward the wallpaper's source color
+# (blend) so kitty's 16-color palette matches the theme while red still
+# reads as red. Used by templates/kitty-colors.conf.
+[config.custom_colors]
+red = { color = "#e05561", blend = true }
+green = { color = "#8cc265", blend = true }
+yellow = { color = "#d8a657", blend = true }
+blue = { color = "#4aa5f0", blend = true }
+magenta = { color = "#c162de", blend = true }
+cyan = { color = "#42b3c2", blend = true }
+
 [templates.gtk-colors]
 input_path = "~/.config/matugen/templates/colors.css"
 output_path = "~/.config/hypr/colors.css"
@@ -23,3 +34,31 @@ output_path = "~/.config/wofi/style.css"
 [templates.fastfetch]
 input_path = "~/.config/matugen/templates/fastfetch.jsonc"
 output_path = "~/.config/fastfetch/config.jsonc"
+
+[templates.hyprlock]
+input_path = "~/.config/matugen/templates/hyprlock-colors.conf"
+output_path = "~/.cache/hypr/hyprlock-colors.conf"
+
+[templates.gtk3]
+input_path = "~/.config/matugen/templates/gtk3.css"
+output_path = "~/.config/gtk-3.0/gtk.css"
+
+[templates.gtk4]
+input_path = "~/.config/matugen/templates/gtk4.css"
+output_path = "~/.config/gtk-4.0/gtk.css"
+
+[templates.swayosd]
+input_path = "~/.config/matugen/templates/swayosd.css"
+output_path = "~/.config/swayosd/style.css"
+
+[templates.starship]
+input_path = "~/.config/matugen/templates/starship.toml"
+output_path = "~/.config/starship.toml"
+
+[templates.vesktop]
+input_path = "~/.config/matugen/templates/vesktop.theme.css"
+output_path = "~/.config/vesktop/themes/matugen.theme.css"
+
+[templates.btop]
+input_path = "~/.config/matugen/templates/btop.theme"
+output_path = "~/.config/btop/themes/matugen.theme"

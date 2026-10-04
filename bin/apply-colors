@@ -48,7 +48,7 @@ fi
 if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} && -f $cache/colors.sh ]]; then
     . "$cache/colors.sh"
     # `hyprctl keyword` is rejected under the Lua config; eval is the way.
-    hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${accent}ee)\", \"rgba(${accent2}ee)\"}, angle = 45 } } } })" >/dev/null
+    hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${accent}ee)\", \"rgba(${accent2}ee)\"}, angle = 45 }, inactive_border = \"rgba(${outline}aa)\" } } })" >/dev/null
 fi
 
 # kitty.conf's listen_on gives each kitty its own /tmp/kitty-<pid> socket.
@@ -64,5 +64,12 @@ else
 fi
 
 pgrep -x swaync >/dev/null && swaync-client -rs >/dev/null
+
+# swayosd-server only reads its stylesheet at startup.
+if pgrep -x swayosd-server >/dev/null; then
+    pkill -x swayosd-server
+    while pgrep -x swayosd-server >/dev/null; do sleep 0.1; done
+    setsid -f swayosd-server >/dev/null 2>&1
+fi
 
 exit 0

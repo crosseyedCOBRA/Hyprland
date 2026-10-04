@@ -89,8 +89,8 @@ local menu        = "wofi --show drun"
 hl.on("hyprland.start", function ()
   -- exec_cmd calls run concurrently, so hyprpolkitagent (a systemd user
   -- service) is chained after the environment import it needs to find Wayland.
-  hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-  hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP && systemctl --user start hyprpolkitagent")
+  hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP QT_QPA_PLATFORMTHEME XCURSOR_THEME XCURSOR_SIZE")
+  hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP QT_QPA_PLATFORMTHEME XCURSOR_THEME XCURSOR_SIZE && systemctl --user start hyprpolkitagent")
   hl.exec_cmd("random-wallpaper && hyprpaper -c ~/.cache/hypr/hyprpaper-runtime.conf")
   hl.exec_cmd("swaync")
   hl.exec_cmd("swayosd-server") -- volume/brightness OSD backend for the swayosd-client calls below
@@ -111,6 +111,11 @@ hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("HYPRCURSOR_SIZE", "24")
+
+-- Qt apps (Dolphin, hyprpolkitagent) take their style, Breeze Dark colors
+-- and Papirus-Dark icons from ~/.config/qt6ct/qt6ct.conf; KDE apps also
+-- read colors from ~/.config/kdeglobals.
+hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 
 -- The session doesn't inherit ~/.bashrc's PATH, so without this the
 -- helper scripts in ~/.local/bin (random-wallpaper, wofi-power, ...) are
