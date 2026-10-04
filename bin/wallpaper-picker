@@ -15,8 +15,8 @@ dir=${WALLPAPER_DIR:-$HOME/.config/wallpapers}
 choice=$(find -L "$dir" -maxdepth 1 -type f \
            \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
            | sort | sed 's/^/img:/' \
-           | wofi --dmenu --allow-images --image-size 220 --columns 3 \
-                  -W 760 -H 560 --prompt "Wallpaper") || exit 0
+           | wofi --dmenu --allow-images -D image_size=280 --columns 3 \
+                  -W 1000 -H 640 --prompt "Wallpaper") || exit 0
 
 img=${choice#img:}
 [[ -f $img ]] || exit 1

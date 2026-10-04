@@ -7,13 +7,13 @@
  * anything about Material You -- just these names. GTK CSS's
  * alpha(@color, N) function covers translucent variants. */
 
-@define-color bg #131318;
-@define-color surface #201f25;
-@define-color surface_alt #2a292f;
-@define-color outline #47464f;
-@define-color text #e5e1e9;
-@define-color muted #928f99;
-@define-color accent #c6bfff;
-@define-color accent2 #c8c3dc;
+@define-color bg #0f1417;
+@define-color surface #1c2023;
+@define-color surface_alt #262b2e;
+@define-color outline #41484d;
+@define-color text #dfe3e7;
+@define-color muted #8b9297;
+@define-color accent #90cef4;
+@define-color accent2 #b6c9d8;
 @define-color urgent #ffb4ab;
-@define-color pill_border_accent #c6bfff;
+@define-color pill_border_accent #90cef4;

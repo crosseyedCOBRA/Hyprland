@@ -104,8 +104,22 @@ end)
 
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/
 
+-- Cursor theme for Hyprland itself and every app it launches. GTK gets the
+-- same theme from ~/.config/gtk-3.0/settings.ini and gsettings; X11/Qt apps
+-- that ignore these fall back to ~/.icons/default/index.theme.
+hl.env("XCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_THEME", "Bibata-Modern-Ice")
 hl.env("HYPRCURSOR_SIZE", "24")
+
+-- The session doesn't inherit ~/.bashrc's PATH, so without this the
+-- helper scripts in ~/.local/bin (random-wallpaper, wofi-power, ...) are
+-- "command not found" for autostart and every keybind that calls them.
+-- Guarded because config reloads re-run this against the already-updated PATH.
+local localBin = os.getenv("HOME") .. "/.local/bin"
+if not (":" .. os.getenv("PATH") .. ":"):find(":" .. localBin .. ":", 1, true) then
+    hl.env("PATH", localBin .. ":" .. os.getenv("PATH"))
+end
 
 
 -----------------------
