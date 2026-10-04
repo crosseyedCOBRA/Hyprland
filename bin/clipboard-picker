@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# clipboard-picker (Super+C, waybar clipboard button)
+#
+# Pick an entry from cliphist's history (fed by the `wl-paste --watch
+# cliphist store` autostart in hyprland.lua) and put it back on the
+# clipboard.
+
+pkill -x wofi && exit 0
+
+sel=$(cliphist list | wofi --dmenu -W 600 --prompt "Clipboard") || exit 0
+cliphist decode <<<"$sel" | wl-copy

@@ -72,13 +72,12 @@ local menu        = "wofi --show drun"
 -- See https://wiki.hypr.land/Configuring/Basics/Autostart/
 
 -- Autostart necessary processes (like notifications daemons, status bars, etc.)
--- waybar/hyprpaper replace noctalia here to match ./waybar/ and
--- ./hyprpaper.conf. xdg-desktop-portal-hyprland/-gtk are started by
--- NixOS's xdg.portal service activation, not needed here. polkit-agent
--- matches the Awesome session's own autostart (see ../awesome/rc.lua).
+-- xdg-desktop-portal-hyprland/-gtk are D-Bus activated on demand, not
+-- needed here. hyprpolkitagent ships its own systemd user unit. waybar
+-- isn't listed because apply-colors launches it (see below).
 --
--- random-wallpaper (../home.nix) picks a random image from
--- ~/Pictures/wallpapers/ every session start, writes hyprpaper's runtime
+-- random-wallpaper (~/.local/bin, source in ../bin/) picks a random image
+-- from ~/.config/wallpapers/ every session start, writes hyprpaper's runtime
 -- config for it, and runs matugen + apply-colors against that same pick
 -- -- chained with `&&` into hyprpaper's own launch (pointed at that exact
 -- runtime config, not the static ./hyprpaper.conf) so hyprpaper always
@@ -88,13 +87,14 @@ local menu        = "wofi --show drun"
 -- wallpapers apply colors identically (waybar launch, kitty reload,
 -- Hyprland active-border color, hyprlock background).
 hl.on("hyprland.start", function ()
+  -- exec_cmd calls run concurrently, so hyprpolkitagent (a systemd user
+  -- service) is chained after the environment import it needs to find Wayland.
+  hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+  hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP && systemctl --user start hyprpolkitagent")
   hl.exec_cmd("random-wallpaper && hyprpaper -c ~/.cache/hypr/hyprpaper-runtime.conf")
   hl.exec_cmd("swaync")
-  hl.exec_cmd("polkit-agent")
   hl.exec_cmd("swayosd-server") -- volume/brightness OSD backend for the swayosd-client calls below
-  hl.exec_cmd("wl-paste --watch cliphist store") -- feeds clipboard-picker's history (../home.nix)
-  hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-  hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
+  hl.exec_cmd("wl-paste --watch cliphist store") -- feeds clipboard-picker's history (../bin/clipboard-picker)
 end)
 
 
@@ -227,12 +227,9 @@ hl.animation({ leaf = "zoomFactor",    enabled = true,  speed = 7,    bezier = "
 --     rounding    = 0,
 -- })
 
--- Pin workspaces to specific monitors. Hyprland's own connector names
--- (set above in MONITORS, 1-indexed: DP-1/DP-2/DP-3) differ from the
--- X11 session's xrandr names in configuration.nix (DisplayPort-0/1/2,
--- 0-indexed) -- DP-1 here is the 165Hz primary (== X11's DisplayPort-0),
--- DP-2 is the 144Hz monitor rotated right of it (== DisplayPort-1), DP-3
--- is the 144Hz monitor right of that (== DisplayPort-2). `default = true`
+-- Pin workspaces to specific monitors (connector names as set above in
+-- MONITORS). DP-1 is the 165Hz primary, DP-2 is the 144Hz monitor rotated right
+-- of it, DP-3 is the 144Hz monitor right of that. `default = true`
 -- is which workspace that monitor shows on session start/monitor
 -- reconnect -- exactly one per monitor. `persistent = true` is what lets
 -- waybar's hyprland/workspaces module show all 5 of these (even empty,
@@ -350,7 +347,7 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 -- closeWindowBind:set_enabled(false)
--- hyprshutdown isn't installed/requested; wofi-power (home.nix) is the
+-- hyprshutdown isn't installed/requested; wofi-power (../bin/) is the
 -- same power menu the traditional hyprland.conf used, wofi-based like
 -- the rest of this session.
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wofi-power"))

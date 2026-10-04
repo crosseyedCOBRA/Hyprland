@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# random-wallpaper
+#
+# Picks a random image from $WALLPAPER_DIR (default ~/.config/wallpapers)
+# and applies it via apply-colors. Run at session start by hyprland.lua,
+# chained with && into hyprpaper's launch so hyprpaper reads the runtime
+# config this just wrote.
+
+set -uo pipefail
+
+dir=${WALLPAPER_DIR:-$HOME/.config/wallpapers}
+
+img=$(find -L "$dir" -maxdepth 1 -type f \
+        \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
+        | shuf -n 1)
+
+if [[ -z $img ]]; then
+    notify-send -u critical "random-wallpaper" "No images found in $dir"
+    exit 1
+fi
+
+exec apply-colors "$img"

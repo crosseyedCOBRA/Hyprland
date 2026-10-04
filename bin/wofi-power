@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# wofi-power (Super+M)
+#
+# Power menu. Icons are JetBrainsMono Nerd Font glyphs, written as escapes
+# so this file stays plain ASCII.
+
+pkill -x wofi && exit 0
+
+lock=$(printf '  Lock')
+logout=$(printf '\U000f0343  Log out')
+suspend=$(printf '\U000f04b2  Suspend')
+reboot=$(printf '\U000f0709  Reboot')
+poweroff=$(printf '  Shut down')
+
+choice=$(printf '%s\n' "$lock" "$logout" "$suspend" "$reboot" "$poweroff" \
+         | wofi --dmenu -H 260 --prompt "Power") || exit 0
+
+case $choice in
+    "$lock")     hyprlock-timeout ;;
+    "$logout")   hyprctl dispatch 'hl.dsp.exit()' ;;
+    "$suspend")  systemctl suspend ;;
+    "$reboot")   systemctl reboot ;;
+    "$poweroff") systemctl poweroff ;;
+esac

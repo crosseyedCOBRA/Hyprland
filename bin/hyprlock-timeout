@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# hyprlock-timeout (Super+L, wofi-power's Lock)
+#
+# Locks the session with hyprlock. Deliberately nothing else: no hypridle,
+# no idle timer, no DPMS -- the screen only locks when asked to and never
+# blanks or times out on its own.
+
+pgrep -x hyprlock >/dev/null && exit 0
+exec hyprlock

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# apply-colors <image>
+#
+# Makes <image> the current wallpaper everywhere and recolors the session
+# from it: writes hyprpaper's runtime config and hyprlock's background,
+# runs matugen (templates in ~/.config/matugen/), then pushes the new
+# colors into everything already running -- Hyprland's active border,
+# open kitty windows, waybar (launched if it isn't running yet) and swaync.
+#
+# Called by random-wallpaper at session start and by wallpaper-picker on
+# every manual change, so both paths apply colors identically. Does not
+# (re)start hyprpaper itself -- callers do that.
+
+set -uo pipefail
+
+img=$(realpath -e "${1:?usage: apply-colors <image>}") || exit 1
+cache=~/.cache/hypr
+mkdir -p "$cache"
+printf '%s\n' "$img" > "$cache/current-wallpaper"
+
+cat > "$cache/hyprpaper-runtime.conf" <<EOF
+splash = false
+
+wallpaper {
+    monitor =
+    path = $img
+    fit_mode = cover
+}
+EOF
+
+# Pulled into ~/.config/hypr/hyprlock.conf via its `source =` line.
+cat > "$cache/hyprlock-wallpaper.conf" <<EOF
+background {
+    monitor =
+    path = $img
+    blur_passes = 2
+    blur_size = 6
+}
+EOF
+
+# --source-color-index: matugen 4 refuses to guess between candidate
+# colors without a terminal to prompt on, which is always the case here.
+if ! matugen image -q -m dark --source-color-index 0 "$img" </dev/null; then
+    notify-send -u critical "apply-colors" "matugen failed for $(basename "$img")"
+    exit 1
+fi
+
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} && -f $cache/colors.sh ]]; then
+    . "$cache/colors.sh"
+    # `hyprctl keyword` is rejected under the Lua config; eval is the way.
+    hyprctl eval "hl.config({ general = { col = { active_border = { colors = {\"rgba(${accent}ee)\", \"rgba(${accent2}ee)\"}, angle = 45 } } } })" >/dev/null
+fi
+
+# kitty.conf's listen_on gives each kitty its own /tmp/kitty-<pid> socket.
+for sock in /tmp/kitty-*; do
+    [[ -S $sock ]] && kitty @ --to "unix:$sock" set-colors --all --configured ~/.config/kitty/colors.conf
+done
+
+# SIGUSR2 makes waybar reload its config and CSS in place.
+if pgrep -x waybar >/dev/null; then
+    pkill -USR2 -x waybar
+else
+    setsid -f waybar >/dev/null 2>&1
+fi
+
+pgrep -x swaync >/dev/null && swaync-client -rs >/dev/null
+
+exit 0

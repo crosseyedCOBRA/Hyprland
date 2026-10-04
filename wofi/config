@@ -11,8 +11,7 @@ insensitive=true
 width=380
 height=400
 
-# Papirus (gtk.iconTheme, ../../home.nix) app icons in the drun launcher,
-# and wofi-power's own per-entry icons (../../home.nix's powerIcons).
+# Papirus app icons in the drun launcher (set as the GTK icon theme).
 allow_images=true
 image_size=28
 
