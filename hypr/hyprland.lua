@@ -268,8 +268,7 @@ hl.workspace_rule({ workspace = "7", monitor = "DP-1", persistent = true })
 -- .desktop file claims StartupWMClass=Vesktop, capitalized, but the real
 -- runtime class is lowercase "vesktop" -- caught this exact mismatch by
 -- checking live instead of trusting the .desktop file). Steam's "steam"
--- is the well-known standard class, not yet confirmed live on this
--- machine -- double check with `hyprctl clients` once it's actually open.
+-- class is confirmed live too (main window lands on 1 while you stay put).
 -- "silent" (confirmed via Window.cpp: the effect value just needs to
 -- contain that literal word) assigns the window to its workspace without
 -- also jumping your view there -- it opens in the background instead of
