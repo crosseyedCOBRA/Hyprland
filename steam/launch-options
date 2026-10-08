@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+"""Export or restore Steam per-game launch options.
+
+  launch-options export   write launch-options.json (next to this script)
+  launch-options restore  apply launch-options.json to Steam's localconfig.vdf
+
+Restore needs Steam closed: it rewrites localconfig.vdf on exit, which would
+discard the change. Export only reads, so it works either way. Restore makes
+a timestamped backup of localconfig.vdf first. The VDF reader/writer below
+round-trips Steam's file byte-for-byte, so only LaunchOptions values change.
+"""
+import glob
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+
+STEAM = os.path.expanduser('~/.local/share/Steam')
+JSON = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'launch-options.json')
+TOKEN = re.compile(r'\s*(?:"((?:[^"\\]|\\.)*)"|(\{)|(\}))')
+
+
+def parse(text):
+    pos, stack, key = 0, [[]], None
+    while True:
+        m = TOKEN.match(text, pos)
+        if not m or m.end() == pos:
+            break
+        pos = m.end()
+        quoted, opened, closed = m.groups()
+        if quoted is not None:
+            if key is None:
+                key = quoted
+            else:
+                stack[-1].append([key, quoted])
+                key = None
+        elif opened:
+            node = []
+            stack[-1].append([key, node])
+            stack.append(node)
+            key = None
+        elif closed:
+            stack.pop()
+    return stack[0]
+
+
+def dump(node, depth=0):
+    out = []
+    tabs = '\t' * depth
+    for k, v in node:
+        if isinstance(v, list):
+            out.append(f'{tabs}"{k}"\n{tabs}{{\n{dump(v, depth + 1)}{tabs}}}\n')
+        else:
+            out.append(f'{tabs}"{k}"\t\t"{v}"\n')
+    return ''.join(out)
+
+
+def get(node, key):
+    for k, v in node:
+        if k == key:
+            return v
+    return None
+
+
+def localconfigs():
+    files = glob.glob(os.path.join(STEAM, 'userdata', '*', 'config', 'localconfig.vdf'))
+    if not files:
+        sys.exit('No Steam localconfig.vdf found -- log in to Steam once, then close it.')
+    return files
+
+
+def apps_of(tree):
+    node = tree
+    for key in ('UserLocalConfigStore', 'Software', 'Valve', 'Steam', 'apps'):
+        node = get(node, key)
+        if node is None:
+            sys.exit('Unexpected localconfig.vdf layout (no Software/Valve/Steam/apps).')
+    return node
+
+
+def game_names():
+    names = {}
+    libs = [STEAM]
+    lf = os.path.join(STEAM, 'steamapps', 'libraryfolders.vdf')
+    if os.path.exists(lf):
+        libs += re.findall(r'"path"\s+"([^"]+)"', open(lf, encoding='utf-8').read())
+    for lib in set(libs):
+        for f in glob.glob(os.path.join(lib, 'steamapps', 'appmanifest_*.acf')):
+            s = open(f, encoding='utf-8').read()
+            appid = re.search(r'"appid"\s+"(\d+)"', s)
+            name = re.search(r'"name"\s+"([^"]+)"', s)
+            if appid and name:
+                names[appid.group(1)] = name.group(1)
+    return names
+
+
+def steam_running():
+    return subprocess.run(['pgrep', '-x', 'steam'], capture_output=True).returncode == 0
+
+
+def export():
+    names = game_names()
+    out = {}
+    for path in localconfigs():
+        text = open(path, encoding='utf-8').read()
+        for appid, node in apps_of(parse(text)):
+            if isinstance(node, list) and get(node, 'LaunchOptions'):
+                out[appid] = {'name': names.get(appid, '?'), 'launch_options': get(node, 'LaunchOptions')}
+    out = dict(sorted(out.items(), key=lambda kv: kv[1]['name'].lower()))
+    with open(JSON, 'w', encoding='utf-8') as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+    print(f'Exported launch options for {len(out)} games to {JSON}')
+
+
+def restore():
+    wanted = json.load(open(JSON, encoding='utf-8'))
+    for path in localconfigs():
+        text = open(path, encoding='utf-8').read()
+        tree = parse(text)
+        if dump(tree) != text:
+            sys.exit(f'{path}: parser would not round-trip this file unchanged; not touching it.')
+        apps = apps_of(tree)
+        for appid, entry in wanted.items():
+            node = get(apps, appid)
+            if node is None:
+                node = []
+                apps.append([appid, node])
+            current = [e for e in node if e[0] == 'LaunchOptions']
+            if current:
+                current[0][1] = entry['launch_options']
+            else:
+                node.append(['LaunchOptions', entry['launch_options']])
+        shutil.copy2(path, f'{path}.bak-{time.strftime("%Y%m%d-%H%M%S")}')
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(dump(tree))
+        print(f'Restored launch options for {len(wanted)} games in {path}')
+
+
+if __name__ == '__main__':
+    if len(sys.argv) != 2 or sys.argv[1] not in ('export', 'restore'):
+        sys.exit(__doc__)
+    if sys.argv[1] == 'export':
+        export()
+    elif steam_running():
+        sys.exit('Steam is running -- close it first (it overwrites localconfig.vdf on exit).')
+    else:
+        restore()

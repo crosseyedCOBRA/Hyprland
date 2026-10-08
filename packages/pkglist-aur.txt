@@ -1,0 +1,10 @@
+# Explicitly installed AUR packages (yay itself is bootstrapped by install.sh).
+# Regenerate: pacman -Qqem | grep -vE '^yay(-debug)?$' > packages/pkglist-aur.txt
+betterbird-bin
+bibata-cursor-theme
+brave-bin
+chatterino2-bin
+heroic-games-launcher
+protonplus
+vesktop
+zen-browser-bin

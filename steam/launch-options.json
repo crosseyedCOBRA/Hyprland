@@ -1,0 +1,90 @@
+{
+  "251570": {
+    "name": "7 Days to Die",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "1086940": {
+    "name": "Baldur's Gate 3",
+    "launch_options": "gamemoderun mangohud %command% --skip-launcher"
+  },
+  "1091500": {
+    "name": "Cyberpunk 2077",
+    "launch_options": "gamemoderun mangohud %command% --launcher-skip"
+  },
+  "881020": {
+    "name": "Granblue Fantasy: Relink",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "1284210": {
+    "name": "Guild Wars 2®",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "1501750": {
+    "name": "Lords of the Fallen",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2767030": {
+    "name": "Marvel Rivals",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2246340": {
+    "name": "Monster Hunter Wilds",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "275850": {
+    "name": "No Man's Sky",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2694490": {
+    "name": "Path of Exile 2",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "750920": {
+    "name": "Shadow of the Tomb Raider",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "3751260": {
+    "name": "The Blood of Dawnwalker",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2073850": {
+    "name": "THE FINALS",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "292030": {
+    "name": "The Witcher 3: Wild Hunt — Remastered",
+    "launch_options": "gamemoderun mangohud %command% --launcher-skip"
+  },
+  "1142710": {
+    "name": "Total War: WARHAMMER III",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "230410": {
+    "name": "Warframe",
+    "launch_options": "PROTON_LOG=1 gamemoderun mangohud %command%"
+  },
+  "1361210": {
+    "name": "Warhammer 40,000: Darktide",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "3556750": {
+    "name": "Warhammer 40,000: Dawn of War - Definitive Edition",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2186680": {
+    "name": "Warhammer 40,000: Rogue Trader",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "2183900": {
+    "name": "Warhammer 40,000: Space Marine 2",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "552500": {
+    "name": "Warhammer: Vermintide 2",
+    "launch_options": "gamemoderun mangohud %command%"
+  },
+  "3513350": {
+    "name": "Wuthering Waves",
+    "launch_options": "gamemoderun mangohud %command%"
+  }
+}
