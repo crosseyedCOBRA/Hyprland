@@ -8,7 +8,8 @@
 # Assumes the base install is already done: booted, network up, a sudo
 # user, GRUB on btrfs (for snapper / grub-btrfs). Safe to re-run -- every
 # step skips work that's already done. Existing config files that would be
-# replaced are backed up to ~/.config-backup-<timestamp>/ first.
+# replaced are backed up to ~/.config-backup-<timestamp>/ first. Configs are
+# symlinked into this repo (bin/link-dotfiles), so later edits land here.
 #
 # Order: pacman setup + mirrors -> official packages -> dotfiles -> system
 # config + services -> user setup -> Flatpaks -> WFHelper -> yay -> AUR
@@ -64,19 +65,11 @@ mapfile -t repo < <(pkglist "$REPO/packages/pkglist-repo.txt")
 sudo pacman -Syu --needed --noconfirm "${repo[@]}"
 
 # ---------------------------------------------------------------------------
-step "Dotfiles -> ~/.config, scripts -> ~/.local/bin"
-for d in hypr kitty waybar wofi swaync fish matugen qt6ct; do
-    place "$REPO/$d" ~/.config/$d
-done
-place "$REPO/gtk-3.0/settings.ini" ~/.config/gtk-3.0/settings.ini
-place "$REPO/gtk-4.0/settings.ini" ~/.config/gtk-4.0/settings.ini
-place "$REPO/btop/btop.conf" ~/.config/btop/btop.conf
-place "$REPO/mangohud/MangoHud.conf" ~/.config/MangoHud/MangoHud.conf
+step "Dotfiles: symlink ~/.config, ~/.local/bin, ... into this repo"
+# Edits made in ~/.config land in the repo; `git status` shows them.
+"$REPO/bin/link-dotfiles"
+# kdeglobals is copied, not linked: KDE's atomic save would replace a link.
 place "$REPO/kde/kdeglobals" ~/.config/kdeglobals
-place "$REPO/icons/default/index.theme" ~/.icons/default/index.theme
-place "$REPO/wallpapers" ~/.config/wallpapers
-mkdir -p ~/.local/bin
-install -m755 "$REPO"/bin/* ~/.local/bin/
 # Generated at login by apply-colors (matugen): make sure the target dirs exist.
 mkdir -p ~/.cache/hypr ~/.config/swayosd ~/.config/btop/themes ~/.config/vesktop/themes ~/.config/fastfetch
 [[ -d $BACKUP ]] && note "replaced files backed up to $BACKUP"
@@ -103,6 +96,10 @@ if ! cmp -s "$REPO/etc/modprobe.d/99-amdgpu-overdrive.conf" /etc/modprobe.d/99-a
 fi
 sudo install -Dm644 "$REPO/etc/modules-load.d/ntsync.conf" /etc/modules-load.d/ntsync.conf
 sudo modprobe ntsync || note "ntsync module not available on this kernel"
+
+step "Pacman hook: keep packages/*.txt in this repo current"
+sed -e "s|@USER@|$USER|g" -e "s|@REPO@|$REPO|g" "$REPO/etc/pacman.d/hooks/zz-update-pkglists.hook" \
+    | sudo install -Dm644 /dev/stdin /etc/pacman.d/hooks/zz-update-pkglists.hook
 
 step "Snapper (root + home) with grub-btrfs boot entries"
 if [[ $(findmnt -no FSTYPE /) == btrfs ]]; then

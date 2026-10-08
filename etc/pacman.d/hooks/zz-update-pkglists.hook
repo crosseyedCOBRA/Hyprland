@@ -1,0 +1,16 @@
+# Keeps the dotfiles repo's package lists current: after every install or
+# removal (pacman or yay), regenerate packages/*.txt. install.sh fills in
+# @USER@ and @REPO@. runuser drops to that user *before* running the script,
+# so a script in a user-writable folder never runs as root. Missing repo or
+# script = silently skipped, never a failed transaction.
+
+[Trigger]
+Operation = Install
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Updating package lists in the dotfiles repo...
+When = PostTransaction
+Exec = /bin/sh -c '[ -x "@REPO@/bin/update-pkglists" ] && /usr/bin/runuser -u @USER@ -- "@REPO@/bin/update-pkglists"; exit 0'

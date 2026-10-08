@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+# link-dotfiles
+#
+# Points the live config locations at this repo with symlinks, so editing
+# ~/.config/hypr/... (or anything else listed below) edits the repo directly
+# and `git status` always shows what changed. Run by install.sh; safe to
+# re-run any time.
+#
+# Anything already at a target that isn't the right symlink is moved to
+# ~/.config-backup-<timestamp>/ first -- nothing is deleted.
+#
+# Not linked on purpose: ~/.config/kdeglobals (KDE apps rewrite it with an
+# atomic save that would replace the symlink with a plain file) -- install.sh
+# copies it instead.
+
+set -euo pipefail
+
+REPO=$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)
+BACKUP=~/.config-backup-$(date +%Y%m%d-%H%M%S)
+linked=0 already=0 backed_up=0
+
+# repo path -> live path
+LINKS=(
+    hypr                    ~/.config/hypr
+    kitty                   ~/.config/kitty
+    waybar                  ~/.config/waybar
+    wofi                    ~/.config/wofi
+    swaync                  ~/.config/swaync
+    fish                    ~/.config/fish
+    matugen                 ~/.config/matugen
+    qt6ct                   ~/.config/qt6ct
+    wallpapers              ~/.config/wallpapers
+    gtk-3.0/settings.ini    ~/.config/gtk-3.0/settings.ini
+    gtk-4.0/settings.ini    ~/.config/gtk-4.0/settings.ini
+    btop/btop.conf          ~/.config/btop/btop.conf
+    mangohud/MangoHud.conf  ~/.config/MangoHud/MangoHud.conf
+    icons/default/index.theme ~/.icons/default/index.theme
+)
+# Every script in bin/ -> ~/.local/bin/<name>
+for script in "$REPO"/bin/*; do
+    LINKS+=("bin/$(basename "$script")" ~/.local/bin/"$(basename "$script")")
+done
+
+link() {
+    local src=$REPO/$1 dst=$2
+    if [[ ! -e $src ]]; then
+        echo "  missing in repo, skipped: $1" >&2
+        return
+    fi
+    if [[ -L $dst && $(readlink -f "$dst") == "$(readlink -f "$src")" ]]; then
+        already=$((already + 1))
+        return
+    fi
+    if [[ -e $dst || -L $dst ]]; then
+        local rel=${dst#"$HOME"/}
+        mkdir -p "$BACKUP/$(dirname "$rel")"
+        mv "$dst" "$BACKUP/$rel"
+        backed_up=$((backed_up + 1))
+    fi
+    mkdir -p "$(dirname "$dst")"
+    ln -s "$src" "$dst"
+    echo "  $dst -> $src"
+    linked=$((linked + 1))
+}
+
+for ((i = 0; i < ${#LINKS[@]}; i += 2)); do
+    link "${LINKS[i]}" "${LINKS[i + 1]}"
+done
+
+echo "linked $linked, already linked $already, moved aside $backed_up"
+[[ $backed_up -gt 0 ]] && echo "previous files are in $BACKUP"
+exit 0
