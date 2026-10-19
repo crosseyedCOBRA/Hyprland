@@ -1,0 +1,25 @@
+#!/bin/bash
+# libzypp commit plugin -- the Tumbleweed counterpart of the pacman hook in
+# etc/pacman.d/hooks/: after every zypper install/removal, regenerate
+# packages/tumbleweed/*.txt. install-tumbleweed.sh fills in @USER@ and @REPO@
+# and installs this to /usr/lib/zypp/plugins/commit/.
+#
+# libzypp talks to commit plugins over stdin/stdout in STOMP frames
+# (PLUGINBEGIN, COMMITBEGIN, COMMITEND, PLUGINEND), each ending in a NUL
+# byte; every frame gets an ACK back. The real work happens on COMMITEND.
+# runuser drops to the user *before* running the script, so a script in a
+# user-writable folder never runs as root. update-pkglists only reads the rpm
+# database (no zypp lock needed, which zypper still holds at this point). Any
+# failure is swallowed -- it must never fail a zypper transaction.
+
+script="@REPO@/bin/update-pkglists"
+
+while IFS= read -r -d '' frame; do
+    cmd=${frame%%$'\n'*}
+    if [[ $cmd == COMMITEND && -x $script ]]; then
+        runuser -u @USER@ -- "$script" </dev/null >/dev/null 2>&1 || true
+    fi
+    printf 'ACK\n\n\0'
+    [[ $cmd == PLUGINEND ]] && break
+done
+exit 0
