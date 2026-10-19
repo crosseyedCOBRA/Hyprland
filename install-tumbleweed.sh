@@ -10,6 +10,8 @@
 # Assumes the base install is already done: booted, network up, a sudo
 # user, btrfs root (the installer default -- snapper with zypper snapshots
 # and bootable snapshots come with it, so this script only adds /home).
+# Works with the default systemd-boot as well as GRUB; the bootloader itself
+# is left exactly as the installer set it up.
 # Safe to re-run -- every step skips work that's already done, and re-running
 # also updates the extras that zypper doesn't manage. Existing config files
 # that would be replaced are backed up to ~/.config-backup-<timestamp>/ first.
@@ -132,22 +134,27 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-step "System config: LACT overclock, ntsync"
+step "System config: LACT overclock, ntsync, zram swap"
 sudo install -Dm644 "$REPO/etc/lact/config.yaml" /etc/lact/config.yaml
 # What LACT's "Enable overclocking" button writes: unlocks amdgpu overdrive.
-# The driver may be loaded from the initramfs, so rebuild that (dracut here,
-# not mkinitcpio). systemd-boot/grub2-bls installs keep their initrds on the
-# ESP via sdbootutil, so let it do the rebuild there.
+# The driver may be loaded from the initramfs, so rebuild that. New installs
+# boot with systemd-boot (or grub2-bls), where the initrds live on the ESP and
+# belong to sdbootutil -- plain dracut would write ones nothing boots.
+# `sdbootutil bootloader` errors on classic GRUB, which uses plain dracut.
 if ! cmp -s "$REPO/etc/modprobe.d/99-amdgpu-overdrive.conf" /etc/modprobe.d/99-amdgpu-overdrive.conf; then
     sudo install -Dm644 "$REPO/etc/modprobe.d/99-amdgpu-overdrive.conf" /etc/modprobe.d/99-amdgpu-overdrive.conf
-    if command -v sdbootutil >/dev/null; then
-        sudo sdbootutil mkinitrd
-    else
-        sudo dracut --force --regenerate-all
-    fi
+    bootloader=$(command -v sdbootutil >/dev/null && sudo sdbootutil bootloader 2>/dev/null || echo grub2)
+    note "bootloader: $bootloader"
+    case $bootloader in
+        systemd-boot|grub2-bls) sudo sdbootutil mkinitrd ;;
+        *)                      sudo dracut --force --regenerate-all ;;
+    esac
 fi
 sudo install -Dm644 "$REPO/etc/modules-load.d/ntsync.conf" /etc/modules-load.d/ntsync.conf
 sudo modprobe ntsync || note "ntsync module not available on this kernel"
+sudo install -Dm644 "$REPO/etc/systemd/zram-generator.conf" /etc/systemd/zram-generator.conf
+sudo systemctl daemon-reload
+sudo systemctl start systemd-zram-setup@zram0.service || note "zram swap starts on next boot"
 
 step "Zypper plugin: keep packages/tumbleweed/*.txt in this repo current"
 sed -e "s|@USER@|$USER|g" -e "s|@REPO@|$REPO|g" "$REPO/etc/zypp/plugins/commit/zz-update-pkglists" \
