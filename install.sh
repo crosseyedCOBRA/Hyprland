@@ -86,7 +86,7 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-step "System config: LACT overclock, ntsync"
+step "System config: LACT overclock, ntsync, zram swap"
 sudo install -Dm644 "$REPO/etc/lact/config.yaml" /etc/lact/config.yaml
 # What LACT's "Enable overclocking" button writes: unlocks amdgpu overdrive.
 # The driver reads it at boot from the initramfs, so rebuild that.
@@ -96,6 +96,9 @@ if ! cmp -s "$REPO/etc/modprobe.d/99-amdgpu-overdrive.conf" /etc/modprobe.d/99-a
 fi
 sudo install -Dm644 "$REPO/etc/modules-load.d/ntsync.conf" /etc/modules-load.d/ntsync.conf
 sudo modprobe ntsync || note "ntsync module not available on this kernel"
+sudo install -Dm644 "$REPO/etc/systemd/zram-generator.conf" /etc/systemd/zram-generator.conf
+sudo systemctl daemon-reload
+sudo systemctl start systemd-zram-setup@zram0.service || note "zram swap starts on next boot"
 
 step "Pacman hook: keep packages/*.txt in this repo current"
 sed -e "s|@USER@|$USER|g" -e "s|@REPO@|$REPO|g" "$REPO/etc/pacman.d/hooks/zz-update-pkglists.hook" \

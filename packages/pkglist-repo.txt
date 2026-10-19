@@ -24,6 +24,7 @@ flatpak
 fuse2
 gamemode
 git
+gnome-calculator
 grim
 grub
 grub-btrfs
