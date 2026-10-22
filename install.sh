@@ -139,6 +139,14 @@ mapfile -t flatpaks < <(pkglist "$REPO/packages/flatpaks.txt")
 sudo flatpak install --system -y --noninteractive flathub "${flatpaks[@]}"
 flatpak list --system --app --columns=application,version | sed 's/^/    /'
 
+step "Default browser: Zen (Flatpak)"
+xdg-settings set default-web-browser app.zen_browser.zen.desktop
+xdg-mime default app.zen_browser.zen.desktop text/html application/xhtml+xml \
+    x-scheme-handler/http x-scheme-handler/https x-scheme-handler/chrome \
+    application/x-extension-htm application/x-extension-html application/x-extension-shtml \
+    application/x-extension-xhtml application/x-extension-xht
+note "$(xdg-settings get default-web-browser)"
+
 step "WFHelper (latest AppImage from GitHub releases)"
 if [[ ! -x ~/WFHelper.AppImage ]]; then
     url=$(curl -fsSL https://api.github.com/repos/WFHelper/WFHelper/releases/latest \
@@ -210,7 +218,7 @@ else
     cat <<EOF
     Everything else is installed. Fix yay / the failed package, then re-run
     this script -- finished steps are skipped. Until then: no Bibata cursor,
-    Vesktop, Zen, Brave, Betterbird, Chatterino, Heroic or ProtonPlus.
+    Vesktop, Brave, Betterbird, Chatterino, Heroic or ProtonPlus.
 EOF
 fi
 cat <<EOF
