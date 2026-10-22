@@ -7,4 +7,3 @@ chatterino2-bin
 heroic-games-launcher
 protonplus
 vesktop
-zen-browser-bin
