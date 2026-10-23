@@ -137,7 +137,18 @@ sudo pacman -S --needed --noconfirm flatpak
 sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 mapfile -t flatpaks < <(pkglist "$REPO/packages/flatpaks.txt")
 sudo flatpak install --system -y --noninteractive flathub "${flatpaks[@]}"
+# Flatpaks can't see /usr/share/themes, so they need adw-gtk3 as an extension
+# to match the host's GTK theme (Zen's menus, scrollbars and file dialogs).
+sudo flatpak install --system -y --noninteractive flathub org.gtk.Gtk3theme.adw-gtk3 org.gtk.Gtk3theme.adw-gtk3-dark
 flatpak list --system --app --columns=application,version | sed 's/^/    /'
+
+step "Desktop appearance (gsettings): dark, adw-gtk3, Papirus, Bibata cursor"
+# Flatpak apps read these through the Settings portal, not settings.ini.
+gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-dark
+gsettings set org.gnome.desktop.interface icon-theme Papirus
+gsettings set org.gnome.desktop.interface cursor-theme Bibata-Modern-Ice
+gsettings set org.gnome.desktop.interface cursor-size 24
 
 step "Default browser: Zen (Flatpak)"
 xdg-settings set default-web-browser app.zen_browser.zen.desktop

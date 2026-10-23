@@ -35,6 +35,7 @@ LINKS=(
     btop/btop.conf          ~/.config/btop/btop.conf
     mangohud/MangoHud.conf  ~/.config/MangoHud/MangoHud.conf
     icons/default/index.theme ~/.icons/default/index.theme
+    xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
 )
 # Every script in bin/ -> ~/.local/bin/<name>
 for script in "$REPO"/bin/*; do
