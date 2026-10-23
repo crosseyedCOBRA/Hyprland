@@ -2,7 +2,7 @@
 # install.sh -- rebuild this desktop on a fresh base Arch install.
 #
 # Run as your normal user (with sudo rights) from a clone of this repo:
-#   git clone git@github.com:crosseyedCOBRA/hyprland.git ~/hyprland
+#   git clone git@github.com:crosseyedCOBRA/Hyprland.git ~/hyprland
 #   ~/hyprland/install.sh
 #
 # Assumes the base install is already done: booted, network up, a sudo
